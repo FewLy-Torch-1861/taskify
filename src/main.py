@@ -69,7 +69,23 @@ def discard(tasks_data: List[Task], taskId: int):
 
 
 def clean(tasks_data: List[Task], taskType: str):
-    print(f"Cleaning {taskType} task...")
+    if taskType == "complete" or taskType == "discard":
+        initial_count = len(tasks_data)
+
+        tasks_to_keep = [task for task in tasks_data if task["status"] != taskType]
+        tasks_data[:] = tasks_to_keep
+
+        removed_count = initial_count - len(tasks_data)
+
+        if removed_count > 0:
+            print(f"🎉 Cleared {removed_count} tasks with status '{taskType}'.")
+        else:
+            print(f"🧹 No tasks with status '{taskType}' found to clear.")
+
+    else:
+        print(
+            f"❌ Error: Task Status '{taskType}' is invalid. Please use 'discard' or 'complete'."
+        )
 
 
 def listTasks(tasks_data: List[Task]):
