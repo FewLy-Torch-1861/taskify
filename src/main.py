@@ -44,7 +44,17 @@ def add(tasks_data: List[Task], taskName: str):
 
 
 def complete(tasks_data: List[Task], taskId: int):
-    print(f"Completing Task: {taskId}...")
+    for task in tasks_data:
+        if task["id"] == taskId:
+            if task["status"] == "complete":
+                print(f"⚠️ Task #{taskId} is already completed.")
+                return
+
+            task["status"] = "complete"
+            print(f"🎉 Task #{taskId}: '{task['name']}' marked as COMPLETE.")
+            return
+
+    print(f"❌ Error: Task ID {taskId} not found.")
 
 
 def discard(tasks_data: List[Task], taskId: int):
@@ -61,7 +71,7 @@ def listTasks(tasks_data: List[Task]):
 
 def loadTask() -> List[Task]:
     try:
-        with open(TASK_FILE, "r", encoding="urf-8") as f:
+        with open(TASK_FILE, "r", encoding="utf-8") as f:
             data = json.load(f)
             return data
     except FileNotFoundError:
@@ -75,7 +85,6 @@ def loadTask() -> List[Task]:
 def saveTask(tasks_data: list):
     with open(TASK_FILE, "w", encoding="utf-8") as f:
         json.dump(tasks_data, f, indent=4, ensure_ascii=False)
-    print("Tasks saved successfully!")
 
 
 def main():
@@ -115,7 +124,7 @@ def main():
             listTasks(current_tasks)
         case _:
             listTasks(current_tasks)
-    
+
     saveTask(current_tasks)
 
 
