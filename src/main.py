@@ -154,7 +154,7 @@ def main():
         "-c", "--complete", type=int, metavar="taskId", help="Mark task as completed."
     )
     paser.add_argument(
-        "-d", "--discard", type=int, metavar="taskId", help="Discard a task."
+        "-d", "--discard", type=int, metavar="taskId", help="Mark task as discarded"
     )
     paser.add_argument(
         "-C",
