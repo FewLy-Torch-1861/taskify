@@ -27,9 +27,6 @@ def get_task_file_path() -> Path:
     return app_dir / "tasks.json"
 
 
-TASK_FILE = get_task_file_path()
-
-
 def add(tasks_data: List[Task], taskName: str):
     if not tasks_data:
         new_id = 1
@@ -58,7 +55,17 @@ def complete(tasks_data: List[Task], taskId: int):
 
 
 def discard(tasks_data: List[Task], taskId: int):
-    print(f"Discarding Task: {taskId}...")
+    for task in tasks_data:
+        if task["id"] == taskId:
+            if task["status"] == "discard":
+                print(f"⚠️ Task #{taskId} is already discarded.")
+                return
+
+            task["status"] = "discard"
+            print(f"🎉 Task #{taskId}: '{task['name']}' marked as DISCARD.")
+            return
+
+    print(f"❌ Error: Task ID {taskId} not found.")
 
 
 def clean(tasks_data: List[Task], taskType: str):
@@ -66,12 +73,37 @@ def clean(tasks_data: List[Task], taskType: str):
 
 
 def listTasks(tasks_data: List[Task]):
-    print("WIP")
+    if not tasks_data:
+        print("\n🎉 Your to-do list is sparkling clean! Nothing to see here. 🎉")
+        return
+
+    print("\n📦 To-Do List:")
+    print("—" * 40)
+
+    for task in tasks_data:
+        task_id = task["id"]
+        task_name = task["name"]
+        status = task["status"]
+
+        if status == "complete":
+            prefix = "  [✅] "
+            display_name = f"\033[90m{task_name}\033[0m"
+        elif status == "discard":
+            prefix = "  [❌] "
+            display_name = f"\033[31m{task_name}\033[0m"
+        else:
+            prefix = "  [⏳] "
+            display_name = task_name
+
+        print(f"{prefix} {task_id:<3} | {display_name}")
+
+    print("—" * 40)
+    print(f"Total tasks: {len(tasks_data)}")
 
 
-def loadTask() -> List[Task]:
+def loadTask(taskFile: Path) -> List[Task]:
     try:
-        with open(TASK_FILE, "r", encoding="utf-8") as f:
+        with open(taskFile, "r", encoding="utf-8") as f:
             data = json.load(f)
             return data
     except FileNotFoundError:
@@ -82,13 +114,14 @@ def loadTask() -> List[Task]:
         return []
 
 
-def saveTask(tasks_data: list):
-    with open(TASK_FILE, "w", encoding="utf-8") as f:
+def saveTask(taskFile, tasks_data: list):
+    with open(taskFile, "w", encoding="utf-8") as f:
         json.dump(tasks_data, f, indent=4, ensure_ascii=False)
 
 
 def main():
-    current_tasks = loadTask()
+    TASK_FILE = get_task_file_path()
+    current_tasks = loadTask(TASK_FILE)
 
     paser = argparse.ArgumentParser(description="CLI To-Do list that just work.")
     paser.add_argument(
@@ -125,7 +158,7 @@ def main():
         case _:
             listTasks(current_tasks)
 
-    saveTask(current_tasks)
+    saveTask(TASK_FILE, current_tasks)
 
 
 if __name__ == "__main__":
