@@ -1,0 +1,7 @@
+*.spec
+
+build/
+dist/
+
+.venv/
+venv/
