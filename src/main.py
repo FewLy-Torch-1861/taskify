@@ -28,44 +28,46 @@ def get_task_file_path() -> Path:
 
 
 def add(tasks_data: List[Task], taskName: str):
-    if not tasks_data:
-        new_id = 1
-    else:
-        new_id = max(task["id"] for task in tasks_data) + 1
-
-    new_task = Task(id=new_id, name=taskName, status="pending")
+    new_task = Task(id=0, name=taskName, status="pending")
 
     tasks_data.append(new_task)
 
-    print(f"✅ Task #{new_id}: '{taskName}' added.")
+    new_id = len(tasks_data)
+    print(f"✅ Task #{new_id}: '{taskName}' has been added.")
 
 
 def complete(tasks_data: List[Task], taskId: int):
-    for task in tasks_data:
-        if task["id"] == taskId:
-            if task["status"] == "complete":
-                print(f"⚠️ Task #{taskId} is already completed.")
-                return
+    task_index = taskId - 1
 
-            task["status"] = "complete"
-            print(f"🎉 Task #{taskId}: '{task['name']}' marked as COMPLETE.")
+    if 0 <= task_index < len(tasks_data):
+        task = tasks_data[task_index]
+
+        if task["status"] == "complete":
+            print(f"⚠️ Task #{taskId} is already completed.")
             return
 
-    print(f"❌ Error: Task ID {taskId} not found.")
+        task["status"] = "complete"
+        print(f"🎉 Task #{taskId}: '{task['name']}' marked as COMPLETE.")
+
+    else:
+        print(f"❌ Error: Task ID {taskId} not found.")
 
 
 def discard(tasks_data: List[Task], taskId: int):
-    for task in tasks_data:
-        if task["id"] == taskId:
-            if task["status"] == "discard":
-                print(f"⚠️ Task #{taskId} is already discarded.")
-                return
+    task_index = taskId - 1
 
-            task["status"] = "discard"
-            print(f"🎉 Task #{taskId}: '{task['name']}' marked as DISCARD.")
+    if 0 <= task_index < len(tasks_data):
+        task = tasks_data[task_index]
+
+        if task["status"] == "discard":
+            print(f"⚠️ Task #{taskId} is already discarded.")
             return
 
-    print(f"❌ Error: Task ID {taskId} not found.")
+        task["status"] = "discard"
+        print(f"🎉 Task #{taskId}: '{task['name']}' marked as DISCARD.")
+
+    else:
+        print(f"❌ Error: Task ID {taskId} not found.")
 
 
 def clean(tasks_data: List[Task], taskType: str):
@@ -96,8 +98,8 @@ def listTasks(tasks_data: List[Task]):
     print("\n📦 To-Do List:")
     print("—" * 40)
 
-    for task in tasks_data:
-        task_id = task["id"]
+    for i, task in enumerate(tasks_data):
+        task_id = i + 1
         task_name = task["name"]
         status = task["status"]
 
@@ -133,6 +135,11 @@ def loadTask(taskFile: Path) -> List[Task]:
 def saveTask(taskFile, tasks_data: list):
     with open(taskFile, "w", encoding="utf-8") as f:
         json.dump(tasks_data, f, indent=4, ensure_ascii=False)
+
+
+def reindex_tasks(tasks_data: List[Task]):
+    for i, task in enumerate(tasks_data):
+        task["id"] = i + 1
 
 
 def main():
@@ -174,6 +181,7 @@ def main():
         case _:
             listTasks(current_tasks)
 
+    reindex_tasks(current_tasks)
     saveTask(TASK_FILE, current_tasks)
 
 
