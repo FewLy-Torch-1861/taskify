@@ -70,6 +70,19 @@ def discard(tasks_data: List[Task], taskId: int):
         print(f"❌ Error: Task ID {taskId} not found.")
 
 
+def edit(tasks_data: List[Task], taskId: int, newName: str):
+    task_index = taskId - 1
+
+    if 0 <= task_index < len(tasks_data):
+        task = tasks_data[task_index]
+        old_name = task["name"]
+        task["name"] = newName
+        print(f"✅ Task #{taskId} has been updated from '{old_name}' to '{newName}'.")
+
+    else:
+        print(f"❌ Error: Task ID {taskId} not found.")
+
+
 def clean(tasks_data: List[Task], taskType: str):
     if taskType == "complete" or taskType == "discard":
         initial_count = len(tasks_data)
@@ -157,6 +170,13 @@ def main():
         "-d", "--discard", type=int, metavar="taskId", help="Mark task as discarded."
     )
     paser.add_argument(
+        "-e",
+        "--edit",
+        nargs=2,
+        metavar=("taskId", "newName"),
+        help="Edit an existing task.",
+    )
+    paser.add_argument(
         "-C",
         "--clean",
         type=str,
@@ -172,6 +192,8 @@ def main():
             add(current_tasks, a.add)
         case a if a.discard is not None:
             discard(current_tasks, a.discard)
+        case a if a.edit is not None:
+            edit(current_tasks, int(a.edit[0]), a.edit[1])
         case a if a.complete is not None:
             complete(current_tasks, a.complete)
         case a if a.clean is not None:
