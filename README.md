@@ -6,9 +6,10 @@
 
 ## Features
 
-- **Add Tasks**: Quickly add new tasks to your list.
+- **Add Tasks**: Quickly add new tasks to your list with an optional priority.
+- **Set Priority**: Adjust the priority of existing tasks.
 - **Update Status**: Mark tasks as `complete` or `discard`.
-- **List View**: View all your tasks with color-coded statuses.
+- **List View**: View all your tasks with color-coded statuses and priorities.
 - **Clean Up**: Remove all `complete` or `discarded` tasks.
 - **Persistent Storage**: Tasks are saved to `tasks.json`, following the XDG Base Directory Specification.
 
@@ -65,18 +66,34 @@ Total tasks: 3
 
 ### Add a New Task
 
-Use the `-a` or `--add` flag followed by the task name in quotes.
+Use the `-a` or `--add` flag followed by the task name in quotes. You can also set the priority using `-p` or `--priority` with `low`, `medium`, `high`, or `urgent`.
 
 **Command:**
 
 ```bash
-./taskify --add "Read a new book"
+./taskify --add "Read a new book" --priority high
 ```
 
 **Output:**
 
 ```
 ✅ Task #4: 'Read a new book' has been added.
+```
+
+### Set Task Priority
+
+Use the `-sp` or `--set-priority` flag followed by the Task ID and the new priority (`low`, `medium`, `high`, or `urgent`).
+
+**Command:**
+
+```bash
+./taskify --set-priority 1 urgent
+```
+
+**Output:**
+
+```
+✅ Task #1: 'Buy groceries' priority updated from 'medium' to 'urgent'.
 ```
 
 ### Complete a Task
