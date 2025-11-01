@@ -11,6 +11,7 @@ class Task(TypedDict):
     id: int
     name: str
     status: Union[str, Any]
+    priority: str
 
 
 def get_task_file_path() -> Path:
@@ -27,8 +28,8 @@ def get_task_file_path() -> Path:
     return app_dir / "tasks.json"
 
 
-def add(tasks_data: List[Task], taskName: str):
-    new_task = Task(id=0, name=taskName, status="pending")
+def add(tasks_data: List[Task], taskName: str, priority: str):
+    new_task = Task(id=0, name=taskName, status="pending", priority=priority)
 
     tasks_data.append(new_task)
 
@@ -75,9 +76,28 @@ def edit(tasks_data: List[Task], taskId: int, newName: str):
 
     if 0 <= task_index < len(tasks_data):
         task = tasks_data[task_index]
+
         old_name = task["name"]
         task["name"] = newName
+
         print(f"✅ Task #{taskId} has been updated from '{old_name}' to '{newName}'.")
+
+    else:
+        print(f"❌ Error: Task ID {taskId} not found.")
+
+
+def set_priority(tasks_data: List[Task], taskId: int, newPriority: str):
+    task_index = taskId - 1
+
+    if 0 <= task_index < len(tasks_data):
+        task = tasks_data[task_index]
+
+        old_priority = task["priority"]
+        task["priority"] = newPriority
+
+        print(
+            f"✅ Task #{taskId}: '{task['name']}' priority updated from '{old_priority}' to '{newPriority}'."
+        )
 
     else:
         print(f"❌ Error: Task ID {taskId} not found.")
@@ -115,15 +135,26 @@ def listTasks(tasks_data: List[Task]):
         task_id = i + 1
         task_name = task["name"]
         status = task["status"]
+        priority = task["priority"]
+
+        priority_emoji = ""
+        if priority == "urgent":
+            priority_emoji = "🔴"
+        elif priority == "high":
+            priority_emoji = "🟠"
+        elif priority == "medium":
+            priority_emoji = "🟡"
+        elif priority == "low":
+            priority_emoji = "🟢"
 
         if status == "complete":
-            prefix = "  [✅] "
+            prefix = f" [✅] [{priority_emoji}]"
             display_name = f"\033[90m{task_name}\033[0m"
         elif status == "discard":
-            prefix = "  [❌] "
+            prefix = f" [❌] [{priority_emoji}]"
             display_name = f"\033[31m{task_name}\033[0m"
         else:
-            prefix = "  [⏳] "
+            prefix = f" [⏳] [{priority_emoji}]"
             display_name = task_name
 
         print(f"{prefix} {task_id:<3} | {display_name}")
@@ -164,6 +195,14 @@ def main():
         "-a", "--add", type=str, metavar="taskName", help="Add a new task."
     )
     paser.add_argument(
+        "-p",
+        "--priority",
+        type=str,
+        default="medium",
+        choices=["low", "medium", "high", "urgent"],
+        help="Set priority for a new task.",
+    )
+    paser.add_argument(
         "-c", "--complete", type=int, metavar="taskId", help="Mark task as completed."
     )
     paser.add_argument(
@@ -177,10 +216,19 @@ def main():
         help="Edit an existing task.",
     )
     paser.add_argument(
+        "-sp",
+        "--set-priority",
+        nargs=2,
+        metavar=("taskId", "newPriority"),
+        choices=["low", "medium", "high", "urgent"],
+        help="Set priority for an existing task.",
+    )
+    paser.add_argument(
         "-C",
         "--clean",
         type=str,
-        metavar="discard|complete",
+        metavar="taskType",
+        choices=["discard", "complete"],
         help="Clean To-Do list by remove completed or discarded task.",
     )
     paser.add_argument("-l", "--list", action="store_true", help="List all task.")
@@ -189,11 +237,13 @@ def main():
 
     match args:
         case a if a.add is not None:
-            add(current_tasks, a.add)
+            add(current_tasks, a.add, a.priority)
         case a if a.discard is not None:
             discard(current_tasks, a.discard)
         case a if a.edit is not None:
             edit(current_tasks, int(a.edit[0]), a.edit[1])
+        case a if a.set_priority is not None:
+            set_priority(current_tasks, int(a.set_priority[0]), a.set_priority[1])
         case a if a.complete is not None:
             complete(current_tasks, a.complete)
         case a if a.clean is not None:
