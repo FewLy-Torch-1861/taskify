@@ -5,3 +5,7 @@ dist/
 
 .venv/
 venv/
+
+.gemini/
+gha-creds-*.json
+GEMINI.md
