@@ -105,6 +105,22 @@ Use the `-d` or `--discard` flag followed by the Task ID.
 ./taskify --discard 3
 ```
 
+### Edit a Task
+
+Use the `-e` or `--edit` flag followed by the Task ID and the new task name in quotes.
+
+**Command:**
+
+```bash
+./taskify --edit 1 "Buy milk and eggs"
+```
+
+**Output:**
+
+```
+✅ Task #1 has been updated from 'Buy groceries' to 'Buy milk and eggs'.
+```
+
 ### Clean the Task List
 
 Remove all tasks with a specific status (`complete` or `discard`) using the `-C` or `--clean` flag.
